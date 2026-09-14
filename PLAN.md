@@ -311,7 +311,7 @@ Each phase ends with a verifiable check.
 
 1. Create AMO API credentials, add `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET`
    as repository secrets.
-2. `.github/workflows/release.yml`.
+2. `.github/workflows/release.yml` (done).
 3. Verify: run the `workflow_dispatch` dry run, then tag `v0.1.0`, confirm a
    release with a signed `.xpi` appears and installs permanently in Firefox and Zen.
 

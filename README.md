@@ -40,3 +40,19 @@ FIREFOX_BIN=/opt/zen-browser-bin/zen-bin GECKODRIVER=/path/to/geckodriver npm ru
 Without `GECKODRIVER`, Selenium looks for geckodriver on `PATH` and otherwise downloads one into
 `~/.cache/selenium`. CI runs these on every push using the Firefox that ships with the GitHub
 runner image.
+
+## Releasing
+
+1. Bump `version` in `src/manifest.json` and `package.json`, move the `Unreleased` entries in
+   `CHANGELOG.md` under a `## [X.Y.Z] - YYYY-MM-DD` heading, commit.
+2. Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+The release workflow verifies the tag matches the manifest version, runs the full check suite,
+signs the package through addons.mozilla.org (unlisted channel) and publishes a GitHub release
+with the signed `.xpi`. It needs the repository secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET`
+from the [AMO API keys page](https://addons.mozilla.org/developers/addon/api/key/). Running the
+workflow manually performs a dry run without signing or publishing.
+
+## Installing
+
+Download the `.xpi` from the latest GitHub release and open it in Firefox or Zen.

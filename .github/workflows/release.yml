@@ -1,0 +1,71 @@
+name: Release
+
+# Tag push (vX.Y.Z): verify, sign through AMO (unlisted) and publish a GitHub
+# release with the signed .xpi. Manual dispatch runs the same steps without
+# signing or publishing, as a dry run.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run ci
+
+      - name: Read manifest version
+        id: version
+        run: echo "version=$(node -p "require('./src/manifest.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Check tag matches manifest version
+        if: github.ref_type == 'tag'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [ "$GITHUB_REF_NAME" != "v$VERSION" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match manifest version $VERSION" >&2
+            exit 1
+          fi
+
+      - name: Extract release notes from CHANGELOG.md
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v v="$VERSION" '/^## \[/{p = index($0, "[" v "]") > 0} p' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            if [ "$GITHUB_REF_TYPE" = tag ]; then
+              echo "CHANGELOG.md has no section for $VERSION" >&2
+              exit 1
+            fi
+            echo "::warning::No CHANGELOG section for $VERSION, using Unreleased for the dry run"
+            awk '/^## \[/{p = index($0, "[Unreleased]") > 0} p' CHANGELOG.md > release-notes.md
+          fi
+          cat release-notes.md
+
+      - name: Sign through AMO (unlisted channel)
+        if: github.ref_type == 'tag'
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: npx web-ext sign --source-dir src --artifacts-dir dist --channel unlisted
+
+      - name: Publish GitHub release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.xpi --title "$GITHUB_REF_NAME" --notes-file release-notes.md
