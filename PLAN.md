@@ -302,6 +302,10 @@ Each phase ends with a verifiable check.
    `driver.getCurrentUrl()` is clean. Roughly 40 lines plus one dev dependency.
    Skip it if you want to stay strictly minimal; the manual check in Phase 1
    then remains the gate.
+   Lessons from the manual Selenium runs in Phases 1 and 3: use the real
+   Zen binary (`/opt/zen-browser-bin/zen-bin`, the `/usr/bin` entry is a
+   wrapper script geckodriver rejects), and do not put a port in a content
+   script match pattern (Firefox silently matches nothing).
 
 ### Phase 5: release
 

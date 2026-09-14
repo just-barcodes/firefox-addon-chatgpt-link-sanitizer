@@ -8,6 +8,9 @@ ChatGPT appends to outbound links.
 - A static `declarativeNetRequest` rule rewrites any top-level navigation whose URL carries
   `utm_source=chatgpt.com`, before the request leaves the browser. Other query parameters and
   the fragment are preserved.
+- A content script that runs only on `chatgpt.com` rewrites link `href`s in the page, so hovering,
+  copying or dragging a link also yields a clean URL. It scans the page once and then watches for
+  added nodes.
 
 No background script, no runtime dependencies, no data collection.
 
@@ -15,6 +18,7 @@ No background script, no runtime dependencies, no data collection.
 
 - **Access your data for all websites** (`<all_urls>`): required by Firefox for any
   `declarativeNetRequest` redirect rule. The addon only ever removes one query parameter.
+- **chatgpt.com**: where the content script runs.
 
 ## Development
 
