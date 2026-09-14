@@ -1,0 +1,33 @@
+{
+  "name": "chatgpt-link-sanitizer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Firefox/Zen addon that removes the utm_source=chatgpt.com tracking parameter ChatGPT adds to links.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "node --test",
+    "ext:lint": "web-ext lint --source-dir src",
+    "ext:build": "web-ext build --source-dir src --artifacts-dir dist --overwrite-dest",
+    "ext:run": "web-ext run --source-dir src",
+    "ext:run:zen": "web-ext run --source-dir src --firefox /usr/bin/zen-browser",
+    "ci": "npm run lint && npm run format:check && npm test && npm run ext:lint && npm run ext:build"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/just-barcodes/firefox-addon-chatgpt-link-sanitizer.git"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.6",
+    "web-ext": "^10.6.0"
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "transform": {
+          "queryTransform": {
+            "removeParams": ["utm_source"]
+          }
+        }
+      }
+    },
+    "condition": {
+      "regexFilter": "[?&]utm_source=chatgpt\\.com(&|#|$)",
+      "resourceTypes": ["main_frame", "sub_frame"]
+    }
+  }
+]
