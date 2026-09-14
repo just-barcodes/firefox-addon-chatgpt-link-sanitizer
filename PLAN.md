@@ -295,7 +295,7 @@ Each phase ends with a verifiable check.
 1. `.github/workflows/ci.yml`, `.github/dependabot.yml`.
 2. Push a branch, open a PR, confirm all checks green and the build artifact
    is downloadable and installable via `about:debugging`.
-3. Optional real-browser e2e (recommended, because it is the only automated
+3. Real-browser e2e (done: `e2e/addon.e2e.js`, job `e2e` in CI; it is the only automated
    check that proves the DNR rule works in Firefox): `selenium-webdriver` +
    geckodriver on `ubuntu-latest` (Firefox is preinstalled), install the built
    `.zip` as a temporary addon, navigate to a URL with the parameter, assert

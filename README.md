@@ -28,3 +28,15 @@ npm run ci          # lint, format check, tests, addon lint, build
 npm run ext:run     # launch Firefox with the addon loaded
 npm run ext:run:zen # same, using Zen
 ```
+
+End-to-end tests install the addon into a headless Firefox and exercise both layers against a
+local server. They need a Firefox-based binary and geckodriver:
+
+```sh
+FIREFOX_BIN=/usr/bin/firefox GECKODRIVER=/path/to/geckodriver npm run test:e2e
+FIREFOX_BIN=/opt/zen-browser-bin/zen-bin GECKODRIVER=/path/to/geckodriver npm run test:e2e
+```
+
+Without `GECKODRIVER`, Selenium looks for geckodriver on `PATH` and otherwise downloads one into
+`~/.cache/selenium`. CI runs these on every push using the Firefox that ships with the GitHub
+runner image.
