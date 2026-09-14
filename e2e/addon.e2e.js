@@ -28,6 +28,7 @@ const INJECT = `for (const [i, href] of arguments[0].entries()) {
 }`;
 
 let server, base, driver, addonDir;
+const settle = () => new Promise((resolve) => setTimeout(resolve, 300));
 
 before(async () => {
   server = http.createServer((req, res) => {
@@ -53,6 +54,15 @@ before(async () => {
   }
   driver = await builder.build();
   await driver.installAddon(addonDir, true);
+
+  // Static rules are loaded asynchronously after install; wait until they act.
+  const deadline = Date.now() + 20_000;
+  for (;;) {
+    await driver.get(`${base}/?utm_source=chatgpt.com`);
+    if ((await driver.getCurrentUrl()) === `${base}/`) break;
+    if (Date.now() > deadline) throw new Error("declarativeNetRequest rules did not become active");
+    await settle();
+  }
 });
 
 after(async () => {
@@ -66,8 +76,6 @@ const hrefs = () =>
   driver.executeScript(
     "return [...document.querySelectorAll('a[data-t]')].map((a) => a.getAttribute('href'))",
   );
-const settle = () => new Promise((resolve) => setTimeout(resolve, 300));
-
 for (const [input, expected] of CLEAN_CASES) {
   test(`network rule redirects ${input}`, async () => {
     await driver.get(local(input));
